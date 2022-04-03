@@ -47,7 +47,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .halt_condition(HaltCondition::MSE(37.0))
         .log_interval(Some(100))
         .momentum(0.35)
-        .rate(0.5)
+        .rate(0.2)
         .go();
 
     let mut success_rate = 0;
