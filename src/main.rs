@@ -19,8 +19,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         if let Ok(record) = result {
             let record: Record = record;
             println!("{:?}", record);
-            let expected = if record.sex == Sex::MALE { 1.0 } else { 0.0 };
-            examples.push((vec![record.body_mass_g / 10000.0, record.flipper_length_mm / 1000.0], vec![expected]))
+            if record.species == "Adelie" {
+                let expected = if record.sex == Sex::MALE { 1.0 } else { 0.0 };
+                examples.push((vec![record.body_mass_g / 10000.0, record.flipper_length_mm / 1000.0], vec![expected]))
+            }
         }
     }
 
@@ -38,16 +40,16 @@ fn main() -> Result<(), Box<dyn Error>> {
     // that specifies the number of layers and the number of nodes in each layer
     // in this case we have an input layer with 2 nodes, one hidden layer
     // with 3 nodes and the output layer has 1 node
-    let mut net = NN::new(&[2, 3, 3, 1]);
+    let mut net = NN::new(&[2, 4, 1]);
 
     // train the network on the examples of the XOR function
     // all methods seen here are optional except go() which must be called to begin training
     // see the documentation for the Trainer struct for more info on what each method does
     net.train(&examples)
-        .halt_condition(HaltCondition::MSE(37.0))
+        .halt_condition(HaltCondition::MSE(15.0))
         .log_interval(Some(100))
-        .momentum(0.35)
-        .rate(0.2)
+        .momentum(0.18)
+        .rate(0.5)
         .go();
 
     let mut success_rate = 0;
