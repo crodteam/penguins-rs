@@ -1,8 +1,14 @@
 use std::error::Error;
+use std::fs::File;
+use std::io::Write;
+use std::io::BufWriter;
 use serde_derive::Deserialize;
 use nn::{NN, HaltCondition};
 
 fn main() -> Result<(), Box<dyn Error>> {
+    let mut output = File::create("net.json").unwrap();
+    let mut writer = BufWriter::new(output);
+
     let mut reader = csv::Reader::from_path("penguins.csv").expect("Failed to read csv data");
     let mut examples = Vec::with_capacity(400);
 
@@ -40,8 +46,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     net.train(&examples)
         .halt_condition(HaltCondition::MSE(37.0))
         .log_interval(Some(100))
-        .momentum(0.2)
-        .rate(0.3)
+        .momentum(0.35)
+        .rate(0.5)
         .go();
 
     let mut success_rate = 0;
@@ -56,7 +62,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         // assert_eq!(result, key);
     }
 
-    println!("Success rate: {}", success_rate as f32 / examples.len() as f32);
+    println!("Success rate: {} / {}", success_rate, examples.len());
+
+    writeln!(writer, "{}", net.to_json());
+    writer.flush().unwrap();
 
     Ok(())
 }
